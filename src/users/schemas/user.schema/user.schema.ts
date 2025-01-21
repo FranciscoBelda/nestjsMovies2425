@@ -7,7 +7,7 @@ export const UserSchema: Schema<any> =
         avatar: String,
         email: {type: String, unique: true, required: true},
         password: {type: String, required: true},
-    });
+    }, {versionKey: false});
 UserSchema.plugin(uniqueValidator,
     {message: 'Email is already in use'});
 
