@@ -7,9 +7,9 @@ export const MovieSchema =
     director: {type: String, required: true},
     plot: {type: String, required: true},
     poster: {type: String, required: true},
-    genres: [{type: String, required: true}],
+    genres: [{type: String, required: false}],
     imdb: {
-        rating: {type: Number, required: true},
-        votes: {type: Number, required: true}
+        rating: {type: Number, required: false},
+        votes: {type: Number, required: false}
     }
 }, {versionKey:false});
