@@ -11,7 +11,7 @@ import { UsersModule } from './users/users.module';
   imports: [
       ConfigModule.forRoot(),
       MongooseModule.forRoot(
-          process.env.DBURL
+          process.env.DBURL as string
       ),
       MoviesModule,
       UsersModule,
