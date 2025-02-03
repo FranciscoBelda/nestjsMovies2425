@@ -132,7 +132,7 @@ export class MoviesController {
         }
     }
 
-    @Put('/:id')
+    @Put('/update/:id')
     async updateMovie(
         @Param('id') id: string,
         @Body() movieDto: MovieDto) {
@@ -162,7 +162,7 @@ export class MoviesController {
         }
     }
 
-    @Delete('/:id')
+    @Delete('/delete/:id')
     async deleteMovie(@Param('id') id: string) {
         try {
             const deletedMovie =
