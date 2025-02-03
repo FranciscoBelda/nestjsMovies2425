@@ -13,7 +13,7 @@ import { UsersModule } from './users/users.module';
 
       }),
       MongooseModule.forRoot(
-          process.env.DBURL
+          process.env.DBURL as string
       ),
       MoviesModule,
       UsersModule,
