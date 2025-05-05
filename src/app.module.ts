@@ -10,7 +10,6 @@ import { UsersModule } from './users/users.module';
 @Module({
   imports: [
       ConfigModule.forRoot({
-
       }),
       MongooseModule.forRoot(
           process.env.DBURL as string

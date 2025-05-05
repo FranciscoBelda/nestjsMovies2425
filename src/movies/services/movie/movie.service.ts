@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {InjectModel} from "@nestjs/mongoose";
 import {Model} from "mongoose";
 import {Movie} from "../../interfaces/movie/movie.interface";
@@ -17,7 +17,7 @@ export class MovieService {
     }
 
     async getMovies(): Promise<Movie[]>{
-        return this.movieModel.find();
+        return this.movieModel.find().exec();
     }
     async getMoviesPaginated(
         page: number,
@@ -43,7 +43,14 @@ export class MovieService {
     }
 
     async getMovie(idMovie: string):Promise<Movie>{
-        return this.movieModel.findById(idMovie);
+        const movie =  await this.movieModel.findById(idMovie).exec();
+        if(!movie){
+            throw new NotFoundException({
+                status: false,
+                message: 'Movie not found'
+            })
+        }
+        return movie;
     }
 
     async getMovieByName(name: string): Promise<Movie[]>{
@@ -54,26 +61,41 @@ export class MovieService {
     }
 
     async updateMovie(id:string,movieDto: MovieDto):Promise<any>{
-        return this.movieModel.findByIdAndUpdate(
+        const updatedMovie = await this.movieModel.findByIdAndUpdate(
             id,
             {$set: movieDto},
             {new: true}
-        )
+        ).exec();
+        if (!updatedMovie) {
+            throw new NotFoundException({
+                status: false,
+                message: 'Movie not found'
+            })
+        }
+        return updatedMovie;
     }
     async patchMovie(id: string, partialMovieDto: Partial<MovieDto>): Promise<Movie | null> {
-        return this.movieModel.findByIdAndUpdate(
+        const patchedMovie = await this.movieModel.findByIdAndUpdate(
           id,
           { $set: partialMovieDto },
           { new: true },
         ).exec();
+        if (!patchedMovie) {
+            throw new NotFoundException({ status: false, message: 'Movie not found' });
+        }
+        return patchedMovie;
     }
 
     async deleteMovie(idMovie: string): Promise<any>{
-        return this.movieModel.findByIdAndDelete(idMovie);
+        const deletedMovie = await this.movieModel.findByIdAndDelete(idMovie).exec();
+        if (!deletedMovie) {
+            throw new NotFoundException({ status: false, message: 'Movie not found' });
+        }
+        return deletedMovie;
     }
 
     async getGenres():Promise<string[]>{
-        return this.movieModel.find().distinct('genres');
+        return this.movieModel.find().distinct('genres').exec();
     }
 
 }

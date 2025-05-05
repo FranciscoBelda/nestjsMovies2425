@@ -22,13 +22,13 @@ export class MoviesController {
         try {
             await this.movieService.addMovie(movieDto);
             return {
-                status: 'Ok',
+                status: true,
                 message: 'Movie Successfully created'
             }
         } catch (e: any) {
             throw new BadRequestException(
                 {
-                    status: 'Error',
+                    status: false,
                     message: e.message
                 })
         }
@@ -41,12 +41,12 @@ export class MoviesController {
             const data =
                 await this.movieService.getMovies();
             return {
-                status: 'Ok',
+                status: true,
                 data
             }
         } catch (e: any) {
             return new BadRequestException({
-                status: 'Error',
+                status: false,
                 message: e.message
             })
         }
@@ -63,12 +63,18 @@ export class MoviesController {
                     page,limit
                 );
             return {
-                status: 'Ok',
+                status: true,
                 ...data
             }
         } catch (e: any) {
-            return new BadRequestException({
-                status: 'Error',
+            if (e instanceof BadRequestException) {
+                throw {
+                    status: false,
+                    message: e.message
+                };
+            }
+            throw new InternalServerErrorException({
+                status: false,
                 message: e.message
             })
         }
@@ -79,22 +85,16 @@ export class MoviesController {
         try {
             const data =
                 await this.movieService.getMovie(id);
-            if (data) {
                 return {
-                    status: 'Ok',
+                    status: true,
                     data
                 }
-            }
-            return new NotFoundException({
-                status: 'Error',
-                message: 'Movie not found'
-            })
         } catch (e: any) {
             if (e instanceof NotFoundException) {
                 throw e
             }
             throw new InternalServerErrorException({
-                status: 'Error',
+                status: false,
                 message: e.message
             })
         }
@@ -107,12 +107,12 @@ export class MoviesController {
                 await this.movieService.getGenres();
 
             return {
-                status: 'Ok',
+                status: true,
                 data
             }
         } catch (e: any) {
             throw new InternalServerErrorException({
-                status: 'Error',
+                status: false,
                 message: e.message
             })
         }
@@ -126,7 +126,7 @@ export class MoviesController {
             return await this.movieService.getMovieByName(name);
         } catch (e: any) {
             throw new InternalServerErrorException({
-                status: 'Error',
+                status: false,
                 message: e.message
             })
         }
@@ -137,18 +137,11 @@ export class MoviesController {
         @Param('id') id: string,
         @Body() movieDto: MovieDto) {
         try {
-            const updatedMovie =
                 await this.movieService.updateMovie(
                     id, movieDto
                 );
-            if (!updatedMovie) {
-                throw new NotFoundException({
-                    status: 'Error',
-                    message: 'Movie not found'
-                })
-            }
             return {
-                status: 'Ok',
+                status: true,
                 message: 'Movie updated'
             }
         } catch (e: any) {
@@ -156,7 +149,7 @@ export class MoviesController {
                 throw e
             }
             throw new InternalServerErrorException({
-                status: 'Error',
+                status: false,
                 message: e.message
             })
         }
@@ -169,39 +162,29 @@ export class MoviesController {
     ) {
         try {
             const patchedMovie = await this.movieService.patchMovie(id, partialMovieDto);
-            if (!patchedMovie) {
-                throw new NotFoundException({ status: 'Error', message: 'Movie not found' });
-            }
-            return { status: 'Ok', message: 'Movie partially updated' };
+            return { status: true, message: 'Movie partially updated' };
         } catch (e: any) {
             if (e instanceof NotFoundException) {
                 throw e;
             }
-            throw new InternalServerErrorException({ status: 'Error', message: e.message });
+            throw new InternalServerErrorException({ status: false, message: e.message });
         }
     }
 
     @Delete('/delete/:id')
     async deleteMovie(@Param('id') id: string) {
         try {
-            const deletedMovie =
-                await this.movieService.deleteMovie(id);
-            if (!deletedMovie) {
-                throw new NotFoundException({
-                    status: 'Error',
-                    message: 'Movie not found'
-                })
-            }
+            await this.movieService.deleteMovie(id);
             return {
-                status: 'Ok',
+                status: false,
                 message: 'Movie deleted'
             }
         } catch (e: any) {
             if (e instanceof NotFoundException) {
-                throw e
+                throw e;
             }
             throw new InternalServerErrorException({
-                status: 'Error',
+                status: false,
                 message: e.message
             })
         }
