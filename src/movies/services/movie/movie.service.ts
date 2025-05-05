@@ -60,6 +60,13 @@ export class MovieService {
             {new: true}
         )
     }
+    async patchMovie(id: string, partialMovieDto: Partial<MovieDto>): Promise<Movie | null> {
+        return this.movieModel.findByIdAndUpdate(
+          id,
+          { $set: partialMovieDto },
+          { new: true },
+        ).exec();
+    }
 
     async deleteMovie(idMovie: string): Promise<any>{
         return this.movieModel.findByIdAndDelete(idMovie);

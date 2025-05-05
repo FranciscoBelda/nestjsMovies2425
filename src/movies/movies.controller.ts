@@ -5,8 +5,8 @@ import {
     Get,
     InternalServerErrorException,
     NotFoundException,
-    Param,
-    Post, Put, Query
+    Param, Patch,
+    Post, Put, Query,
 } from '@nestjs/common';
 import {MovieService} from "./services/movie/movie.service";
 import {MovieDto} from "./dto/movie.dto/movie.dto";
@@ -20,7 +20,7 @@ export class MoviesController {
     @Post('')
     async addMovie(@Body() movieDto: MovieDto) {
         try {
-            const resp = await this.movieService.addMovie(movieDto);
+            await this.movieService.addMovie(movieDto);
             return {
                 status: 'Ok',
                 message: 'Movie Successfully created'
@@ -159,6 +159,25 @@ export class MoviesController {
                 status: 'Error',
                 message: e.message
             })
+        }
+    }
+
+    @Patch('/update/:id')
+    async patchMovie(
+      @Param('id') id: string,
+      @Body() partialMovieDto: Partial<MovieDto>, // Usamos Partial para indicar que solo algunos campos son necesarios
+    ) {
+        try {
+            const patchedMovie = await this.movieService.patchMovie(id, partialMovieDto);
+            if (!patchedMovie) {
+                throw new NotFoundException({ status: 'Error', message: 'Movie not found' });
+            }
+            return { status: 'Ok', message: 'Movie partially updated' };
+        } catch (e: any) {
+            if (e instanceof NotFoundException) {
+                throw e;
+            }
+            throw new InternalServerErrorException({ status: 'Error', message: e.message });
         }
     }
 
